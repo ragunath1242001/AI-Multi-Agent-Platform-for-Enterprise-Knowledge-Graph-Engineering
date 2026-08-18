@@ -1,0 +1,138 @@
+@prefix so: <https://semanticops.ai/ontology/core#> .
+@prefix med: <https://semanticops.ai/example/medical/> .
+@prefix somed: <https://semanticops.ai/ontology/medical#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+med:synthetic-cohort-dataset a so:KnowledgeAsset ;
+  somed:sourceType "synthetic" ;
+  somed:generatedFor "SemanticOps graph-store smoke dataset" ;
+  so:describes med:cohort-2026-q3 .
+
+med:cohort-2026-q3 a so:BusinessEntity, somed:PatientCohort ;
+  somed:cohortName "Synthetic cardiometabolic monitoring cohort" ;
+  somed:recordCount 5 ;
+  somed:containsPatient med:patient-001, med:patient-002, med:patient-003, med:patient-004, med:patient-005 .
+
+med:patient-001 a somed:Patient ;
+  somed:age 52 ;
+  somed:sex "female" ;
+  somed:hasCondition med:hypertension ;
+  somed:hasObservation med:bp-001, med:hba1c-001 ;
+  somed:assignedCarePlan med:care-plan-001 .
+
+med:patient-002 a somed:Patient ;
+  somed:age 67 ;
+  somed:sex "male" ;
+  somed:hasCondition med:type-2-diabetes, med:hyperlipidemia ;
+  somed:hasObservation med:bp-002, med:ldl-002 ;
+  somed:assignedCarePlan med:care-plan-002 .
+
+med:patient-003 a somed:Patient ;
+  somed:age 44 ;
+  somed:sex "female" ;
+  somed:hasCondition med:asthma ;
+  somed:hasObservation med:spo2-003 ;
+  somed:assignedCarePlan med:care-plan-003 .
+
+med:patient-004 a somed:Patient ;
+  somed:age 59 ;
+  somed:sex "male" ;
+  somed:hasCondition med:hypertension, med:chronic-kidney-disease ;
+  somed:hasObservation med:egfr-004, med:bp-004 ;
+  somed:assignedCarePlan med:care-plan-004 .
+
+med:patient-005 a somed:Patient ;
+  somed:age 36 ;
+  somed:sex "female" ;
+  somed:hasCondition med:migraine ;
+  somed:hasObservation med:headache-days-005 ;
+  somed:assignedCarePlan med:care-plan-005 .
+
+med:hypertension a somed:Condition ;
+  somed:conditionLabel "Hypertension" .
+
+med:type-2-diabetes a somed:Condition ;
+  somed:conditionLabel "Type 2 diabetes" .
+
+med:hyperlipidemia a somed:Condition ;
+  somed:conditionLabel "Hyperlipidemia" .
+
+med:asthma a somed:Condition ;
+  somed:conditionLabel "Asthma" .
+
+med:chronic-kidney-disease a somed:Condition ;
+  somed:conditionLabel "Chronic kidney disease" .
+
+med:migraine a somed:Condition ;
+  somed:conditionLabel "Migraine" .
+
+med:bp-001 a somed:Observation ;
+  somed:observationName "Systolic blood pressure" ;
+  somed:value 138 ;
+  somed:unit "mmHg" ;
+  somed:observedAt "2026-07-01"^^xsd:date .
+
+med:hba1c-001 a somed:Observation ;
+  somed:observationName "HbA1c" ;
+  somed:value 5.8 ;
+  somed:unit "%" ;
+  somed:observedAt "2026-07-01"^^xsd:date .
+
+med:bp-002 a somed:Observation ;
+  somed:observationName "Systolic blood pressure" ;
+  somed:value 146 ;
+  somed:unit "mmHg" ;
+  somed:observedAt "2026-07-02"^^xsd:date .
+
+med:ldl-002 a somed:Observation ;
+  somed:observationName "LDL cholesterol" ;
+  somed:value 128 ;
+  somed:unit "mg/dL" ;
+  somed:observedAt "2026-07-02"^^xsd:date .
+
+med:spo2-003 a somed:Observation ;
+  somed:observationName "Oxygen saturation" ;
+  somed:value 97 ;
+  somed:unit "%" ;
+  somed:observedAt "2026-07-03"^^xsd:date .
+
+med:egfr-004 a somed:Observation ;
+  somed:observationName "Estimated glomerular filtration rate" ;
+  somed:value 58 ;
+  somed:unit "mL/min/1.73m2" ;
+  somed:observedAt "2026-07-04"^^xsd:date .
+
+med:bp-004 a somed:Observation ;
+  somed:observationName "Systolic blood pressure" ;
+  somed:value 152 ;
+  somed:unit "mmHg" ;
+  somed:observedAt "2026-07-04"^^xsd:date .
+
+med:headache-days-005 a somed:Observation ;
+  somed:observationName "Monthly headache days" ;
+  somed:value 9 ;
+  somed:unit "days/month" ;
+  somed:observedAt "2026-07-05"^^xsd:date .
+
+med:care-plan-001 a somed:CarePlan ;
+  somed:planLabel "Blood pressure follow-up" ;
+  somed:riskTier "moderate" .
+
+med:care-plan-002 a somed:CarePlan ;
+  somed:planLabel "Diabetes and lipid monitoring" ;
+  somed:riskTier "high" .
+
+med:care-plan-003 a somed:CarePlan ;
+  somed:planLabel "Asthma control review" ;
+  somed:riskTier "low" .
+
+med:care-plan-004 a somed:CarePlan ;
+  somed:planLabel "Kidney function and blood pressure review" ;
+  somed:riskTier "high" .
+
+med:care-plan-005 a somed:CarePlan ;
+  somed:planLabel "Migraine frequency tracking" ;
+  somed:riskTier "moderate" .
+
+
+

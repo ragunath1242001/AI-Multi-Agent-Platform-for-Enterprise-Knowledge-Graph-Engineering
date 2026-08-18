@@ -1,0 +1,53 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix somed: <https://semanticops.ai/ontology/medical#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+somed:ClinicalCohortShape a sh:NodeShape ;
+  sh:targetClass somed:ClinicalCohort ;
+  sh:property [
+    sh:path somed:cohortName ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+somed:ClinicalRecordShape a sh:NodeShape ;
+  sh:targetClass somed:ClinicalRecord ;
+  sh:property [
+    sh:path somed:hasPatient ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path somed:hasDiagnosis ;
+    sh:minCount 1
+  ] .
+
+somed:PatientShape a sh:NodeShape ;
+  sh:targetClass somed:Patient ;
+  sh:property [
+    sh:path somed:age
+  ] .
+
+somed:ObservationShape a sh:NodeShape ;
+  sh:targetClass somed:Observation ;
+  sh:property [
+    sh:path somed:observationName ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path somed:value ;
+    sh:minCount 1
+  ] .
+
+somed:HeartDiseaseDiagnosisShape a sh:NodeShape ;
+  sh:targetClass somed:HeartDiseaseDiagnosis ;
+  sh:property [
+    sh:path somed:hasHeartDiseasePresence ;
+    sh:minCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] ;
+  sh:property [
+    sh:path somed:num ;
+    sh:minCount 1 ;
+    sh:datatype xsd:integer
+  ] .

@@ -1,0 +1,10 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix so: <https://semanticops.ai/ontology/core#> .
+
+so:KnowledgeAssetShape a sh:NodeShape ;
+  sh:targetClass so:KnowledgeAsset ;
+  sh:property [
+    sh:path so:describes ;
+    sh:minCount 1 ;
+  ] .
+

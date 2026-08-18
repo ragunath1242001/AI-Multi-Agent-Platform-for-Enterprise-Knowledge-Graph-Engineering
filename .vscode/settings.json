@@ -1,0 +1,7 @@
+{
+  "editor.formatOnSave": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "typescript.tsdk": "frontend/node_modules/typescript/lib"
+}
+

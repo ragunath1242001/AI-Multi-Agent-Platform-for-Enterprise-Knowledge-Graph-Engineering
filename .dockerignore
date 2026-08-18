@@ -1,0 +1,11 @@
+.git
+.venv
+node_modules
+**/node_modules
+**/.next
+**/.pytest_cache
+**/.ruff_cache
+**/__pycache__
+.env
+docker/fuseki/databases
+

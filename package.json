@@ -1,0 +1,13 @@
+{
+  "name": "semanticops",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "docker compose up --build",
+    "test": "pnpm --dir frontend test",
+    "lint": "pnpm --dir frontend lint",
+    "format": "pnpm --dir frontend format"
+  }
+}
+

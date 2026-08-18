@@ -1,0 +1,8 @@
+@prefix so: <https://semanticops.ai/ontology/core#> .
+@prefix ex: <https://semanticops.ai/example/> .
+
+ex:account-policy a so:KnowledgeAsset ;
+  so:describes ex:customer-account .
+
+ex:customer-account a so:BusinessEntity .
+

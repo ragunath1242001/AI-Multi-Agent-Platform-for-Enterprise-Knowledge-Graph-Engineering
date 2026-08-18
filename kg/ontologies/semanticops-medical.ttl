@@ -1,0 +1,220 @@
+@prefix somed: <https://semanticops.ai/ontology/medical#> .
+@prefix so: <https://semanticops.ai/ontology/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+somed: a owl:Ontology ;
+  rdfs:label "SemanticOps Medical Ontology" ;
+  rdfs:comment "Local medical dataset ontology for de-identified and synthetic clinical graph demos." ;
+  dcterms:requires so: ;
+  owl:versionInfo "0.1.0" .
+
+somed:MedicalDataset a owl:Class ;
+  rdfs:subClassOf so:KnowledgeAsset ;
+  rdfs:label "Medical Dataset" .
+
+somed:ClinicalCohort a owl:Class ;
+  rdfs:subClassOf so:BusinessEntity ;
+  rdfs:label "Clinical Cohort" .
+
+somed:PatientCohort a owl:Class ;
+  rdfs:subClassOf somed:ClinicalCohort ;
+  rdfs:label "Patient Cohort" .
+
+somed:Patient a owl:Class ;
+  rdfs:label "Patient" .
+
+somed:PatientProfile a owl:Class ;
+  rdfs:subClassOf somed:Patient ;
+  rdfs:label "Patient Profile" .
+
+somed:ClinicalRecord a owl:Class ;
+  rdfs:label "Clinical Record" .
+
+somed:Condition a owl:Class ;
+  rdfs:label "Condition" .
+
+somed:Observation a owl:Class ;
+  rdfs:label "Observation" .
+
+somed:CarePlan a owl:Class ;
+  rdfs:label "Care Plan" .
+
+somed:Diagnosis a owl:Class ;
+  rdfs:label "Diagnosis" .
+
+somed:HeartDiseaseDiagnosis a owl:Class ;
+  rdfs:subClassOf somed:Diagnosis ;
+  rdfs:label "Heart Disease Diagnosis" .
+
+somed:containsPatient a owl:ObjectProperty ;
+  rdfs:domain somed:ClinicalCohort ;
+  rdfs:range somed:Patient ;
+  rdfs:label "contains patient" .
+
+somed:hasRecord a owl:ObjectProperty ;
+  rdfs:domain somed:ClinicalCohort ;
+  rdfs:range somed:ClinicalRecord ;
+  rdfs:label "has record" .
+
+somed:hasPatient a owl:ObjectProperty ;
+  rdfs:domain somed:ClinicalRecord ;
+  rdfs:range somed:Patient ;
+  rdfs:label "has patient" .
+
+somed:hasDiagnosis a owl:ObjectProperty ;
+  rdfs:domain somed:ClinicalRecord ;
+  rdfs:range somed:Diagnosis ;
+  rdfs:label "has diagnosis" .
+
+somed:hasCondition a owl:ObjectProperty ;
+  rdfs:domain somed:Patient ;
+  rdfs:range somed:Condition ;
+  rdfs:label "has condition" .
+
+somed:hasObservation a owl:ObjectProperty ;
+  rdfs:domain somed:Patient ;
+  rdfs:range somed:Observation ;
+  rdfs:label "has observation" .
+
+somed:assignedCarePlan a owl:ObjectProperty ;
+  rdfs:domain somed:Patient ;
+  rdfs:range somed:CarePlan ;
+  rdfs:label "assigned care plan" .
+
+somed:sourceType a owl:DatatypeProperty ;
+  rdfs:domain somed:MedicalDataset ;
+  rdfs:range xsd:string ;
+  rdfs:label "source type" .
+
+somed:generatedFor a owl:DatatypeProperty ;
+  rdfs:domain somed:MedicalDataset ;
+  rdfs:range xsd:string ;
+  rdfs:label "generated for" .
+
+somed:sourceFile a owl:DatatypeProperty ;
+  rdfs:domain somed:MedicalDataset ;
+  rdfs:range xsd:string ;
+  rdfs:label "source file" .
+
+somed:cohortName a owl:DatatypeProperty ;
+  rdfs:domain somed:ClinicalCohort ;
+  rdfs:range xsd:string ;
+  rdfs:label "cohort name" .
+
+somed:recordCount a owl:DatatypeProperty ;
+  rdfs:domain somed:ClinicalCohort ;
+  rdfs:range xsd:integer ;
+  rdfs:label "record count" .
+
+somed:age a owl:DatatypeProperty ;
+  rdfs:domain somed:Patient ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "age" .
+
+somed:sex a owl:DatatypeProperty ;
+  rdfs:domain somed:Patient ;
+  rdfs:range xsd:string ;
+  rdfs:label "sex" .
+
+somed:conditionLabel a owl:DatatypeProperty ;
+  rdfs:domain somed:Condition ;
+  rdfs:range xsd:string ;
+  rdfs:label "condition label" .
+
+somed:observationName a owl:DatatypeProperty ;
+  rdfs:domain somed:Observation ;
+  rdfs:range xsd:string ;
+  rdfs:label "observation name" .
+
+somed:value a owl:DatatypeProperty ;
+  rdfs:domain somed:Observation ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "value" .
+
+somed:unit a owl:DatatypeProperty ;
+  rdfs:domain somed:Observation ;
+  rdfs:range xsd:string ;
+  rdfs:label "unit" .
+
+somed:observedAt a owl:DatatypeProperty ;
+  rdfs:domain somed:Observation ;
+  rdfs:range xsd:date ;
+  rdfs:label "observed at" .
+
+somed:planLabel a owl:DatatypeProperty ;
+  rdfs:domain somed:CarePlan ;
+  rdfs:range xsd:string ;
+  rdfs:label "plan label" .
+
+somed:riskTier a owl:DatatypeProperty ;
+  rdfs:domain somed:CarePlan ;
+  rdfs:range xsd:string ;
+  rdfs:label "risk tier" .
+
+somed:hasHeartDiseasePresence a owl:DatatypeProperty ;
+  rdfs:domain somed:HeartDiseaseDiagnosis ;
+  rdfs:range xsd:boolean ;
+  rdfs:label "has heart disease presence" .
+
+somed:num a owl:DatatypeProperty ;
+  rdfs:domain somed:HeartDiseaseDiagnosis ;
+  rdfs:range xsd:integer ;
+  rdfs:label "UCI target value" .
+
+somed:cp a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "chest pain type" .
+
+somed:trestbps a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "resting blood pressure" .
+
+somed:chol a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "serum cholesterol" .
+
+somed:fbs a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "fasting blood sugar flag" .
+
+somed:restecg a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "resting ECG result" .
+
+somed:thalach a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "maximum heart rate achieved" .
+
+somed:exang a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "exercise induced angina" .
+
+somed:oldpeak a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "ST depression induced by exercise" .
+
+somed:slope a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "peak exercise ST segment slope" .
+
+somed:ca a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "major vessels colored by fluoroscopy" .
+
+somed:thal a owl:DatatypeProperty ;
+  rdfs:domain somed:PatientProfile ;
+  rdfs:range xsd:decimal ;
+  rdfs:label "thalassemia category" .

@@ -1,0 +1,17 @@
+@prefix so: <https://semanticops.ai/ontology/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+so: a owl:Ontology ;
+  rdfs:label "SemanticOps Core Ontology" .
+
+so:BusinessEntity a owl:Class ;
+  rdfs:label "Business Entity" .
+
+so:KnowledgeAsset a owl:Class ;
+  rdfs:label "Knowledge Asset" .
+
+so:describes a owl:ObjectProperty ;
+  rdfs:domain so:KnowledgeAsset ;
+  rdfs:range so:BusinessEntity .
+
