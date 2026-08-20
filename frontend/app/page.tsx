@@ -1,5 +1,6 @@
 import { Activity, Bot, Database, GitBranch, Search, ShieldCheck } from "lucide-react";
 import { MetricCard } from "@/components/metric-card";
+import { NaturalLanguageQuery } from "@/components/natural-language-query";
 import { PipelineStep } from "@/components/pipeline-step";
 import { ValidationWorkspace } from "@/components/validation-workspace";
 
@@ -19,11 +20,12 @@ export default function Home() {
           <span>SemanticOps</span>
         </div>
         <nav>
-          <a className="active" href="#">Operations</a>
-          <a href="#">Agents</a>
-          <a href="#">Ontology</a>
-          <a href="#">Validation</a>
-          <a href="#">Observability</a>
+          <a className="active" href="/">Operations</a>
+          <a href="/agents">Agents</a>
+          <a href="/ontology">Ontology</a>
+          <a href="/validation">Validation</a>
+          <a href="/observability">Observability</a>
+          <a href="/demo">Demo</a>
         </nav>
       </aside>
 
@@ -33,10 +35,10 @@ export default function Home() {
             <p className="eyebrow">Knowledge graph engineering</p>
             <h1>Enterprise Semantic Operations</h1>
           </div>
-          <button type="button" className="primary-action">
+          <a href="#natural-language-query" className="primary-action">
             <Search size={18} aria-hidden="true" />
             Query graph
-          </button>
+          </a>
         </header>
 
         <section className="metrics" aria-label="Platform metrics">
@@ -59,20 +61,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="panel query-panel">
-            <div className="panel-heading">
-              <h2>Natural Language Query</h2>
-              <span>SPARQL translation workspace</span>
-            </div>
-            <label htmlFor="query">Question</label>
-            <textarea
-              id="query"
-              defaultValue="Which policies describe customer account risk controls?"
-            />
-            <div className="result-preview">
-              <code>SELECT ?policy ?control WHERE {"{ ... }"}</code>
-            </div>
-          </div>
+          <NaturalLanguageQuery />
         </section>
 
         <section className="panel validation-panel">

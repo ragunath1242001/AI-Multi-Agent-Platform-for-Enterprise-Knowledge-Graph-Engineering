@@ -221,6 +221,33 @@ label {
   gap: 10px;
 }
 
+.query-form {
+  display: grid;
+  gap: 10px;
+}
+
+.query-code,
+.query-results {
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+}
+
+.query-results {
+  background: #17211b;
+  border-radius: 8px;
+  color: #e9f4eb;
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  padding: 14px;
+  white-space: pre-wrap;
+}
+
+.query-explanation {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 0;
+}
+
 textarea {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -231,6 +258,15 @@ textarea {
 }
 
 input {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+select {
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   min-height: 40px;
@@ -398,6 +434,243 @@ input {
   grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
 }
 
+.agent-registry,
+.agent-workspace {
+  margin-bottom: 16px;
+}
+
+.agent-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.agent-runner {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+}
+
+.dataset-list,
+.run-details,
+.recent-runs {
+  display: grid;
+  gap: 12px;
+}
+
+.ontology-layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+}
+
+.ontology-list,
+.ontology-detail {
+  min-width: 0;
+}
+
+.ontology-metrics {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.ontology-metrics div {
+  background: var(--surface-muted);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.ontology-metrics strong,
+.ontology-metrics span {
+  display: block;
+}
+
+.ontology-metrics strong {
+  font-size: 22px;
+}
+
+.ontology-metrics span,
+.ontology-path {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.ontology-detail pre {
+  background: #17211b;
+  border-radius: 8px;
+  color: #e9f4eb;
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  margin: 0;
+  max-height: 620px;
+  overflow: auto;
+  padding: 14px;
+  white-space: pre-wrap;
+}
+
+.activity-list {
+  display: grid;
+  gap: 8px;
+}
+
+.activity-list article {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 10px 12px;
+}
+
+.activity-list article div,
+.activity-list article span {
+  min-width: 0;
+}
+
+.activity-list article strong,
+.activity-list article div span {
+  display: block;
+}
+
+.activity-list article div span {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.status-badge {
+  background: var(--surface-muted);
+  border-radius: 999px;
+  color: var(--muted);
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 9px;
+  text-transform: capitalize;
+}
+
+.status-badge.completed {
+  background: #dff3e8;
+  color: #166534;
+}
+
+.status-badge.failed {
+  background: #fee4e2;
+  color: #b42318;
+}
+
+.demo-panel {
+  max-width: 980px;
+}
+
+.demo-steps {
+  display: grid;
+  gap: 10px;
+}
+
+.demo-steps article {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 36px minmax(0, 1fr) 24px;
+  min-height: 68px;
+  padding: 12px;
+}
+
+.demo-steps article.completed {
+  border-color: #86c6a3;
+}
+
+.demo-steps article.failed {
+  border-color: #f4a6a1;
+}
+
+.demo-step-number {
+  align-items: center;
+  background: var(--surface-muted);
+  border-radius: 50%;
+  display: flex;
+  font-weight: 700;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+.demo-steps article p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.demo-steps article svg {
+  color: var(--accent);
+}
+
+.demo-steps article.running svg {
+  animation: spin 1s linear infinite;
+}
+
+.demo-steps article.failed svg {
+  color: #b42318;
+}
+
+.demo-summary {
+  background: #17211b;
+  border-radius: 8px;
+  color: #e9f4eb;
+  margin: 16px 0 0;
+  padding: 14px;
+}
+
+.run-details {
+  border-left: 1px solid var(--line);
+  padding-left: 16px;
+}
+
+.run-details h3,
+.run-details p {
+  margin-bottom: 0;
+}
+
+.run-details ol {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run-details li {
+  background: var(--surface-muted);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.run-details li span,
+.recent-runs .section-heading span {
+  color: var(--muted);
+  float: right;
+  font-size: 13px;
+}
+
+.run-details li p {
+  clear: both;
+  color: var(--muted);
+  font-size: 13px;
+  padding-top: 6px;
+}
+
+.recent-runs {
+  border-top: 1px solid var(--line);
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
 .graph-inventory,
 .sparql-workbench {
   border-top: 1px solid var(--line);
@@ -454,7 +727,10 @@ input {
   .metrics,
   .panel-grid,
   .validation-layout,
-  .graph-store-grid {
+  .graph-store-grid,
+  .agent-grid,
+  .agent-runner,
+  .ontology-layout {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -474,8 +750,19 @@ input {
   .metrics,
   .panel-grid,
   .validation-layout,
-  .graph-store-grid {
+  .graph-store-grid,
+  .agent-grid,
+  .agent-runner,
+  .ontology-layout,
+  .ontology-metrics {
     grid-template-columns: 1fr;
+  }
+
+  .run-details {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding-left: 0;
+    padding-top: 16px;
   }
 
   h1 {

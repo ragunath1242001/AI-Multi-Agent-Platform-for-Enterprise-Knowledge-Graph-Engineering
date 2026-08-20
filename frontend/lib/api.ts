@@ -35,6 +35,44 @@ export type SparqlQueryResult = {
   };
 };
 
+export type NaturalLanguageQueryResult = {
+  query: string;
+  explanation: string;
+};
+
+export type IngestionDataset = {
+  key: string;
+  graph_name: string;
+  title: string;
+  path: string;
+};
+
+export type IngestionRun = {
+  id: string;
+  dataset_key: string;
+  graph_name: string;
+  status: string;
+  steps: { name: string; status: string; detail: string }[];
+  validation_report_id?: string | null;
+  triple_count: number | null;
+  error: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OntologyModule = {
+  key: string;
+  title: string;
+  path: string;
+  namespace: string;
+  version: string | null;
+  triple_count: number;
+  class_count: number;
+  object_property_count: number;
+  datatype_property_count: number;
+  turtle: string;
+};
+
 export async function getHealth(): Promise<{ status: string; service: string }> {
   const response = await fetch(`${API_BASE_URL}/api/v1/health`, {
     next: { revalidate: 30 },
@@ -111,6 +149,73 @@ export async function executeSparqlQuery(query: string): Promise<SparqlQueryResu
 
   if (!response.ok) {
     throw new Error("Graph query failed.");
+  }
+
+  return response.json();
+}
+
+export async function translateNaturalLanguageQuery(
+  question: string,
+): Promise<NaturalLanguageQueryResult> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/knowledge-graphs/translate-query`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new Error(payload?.detail || "Query translation failed.");
+  }
+
+  return response.json();
+}
+
+export async function listIngestionDatasets(): Promise<IngestionDataset[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/workflows/ingestion/datasets`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not load ingestion datasets.");
+  }
+
+  return response.json();
+}
+
+export async function listIngestionRuns(): Promise<IngestionRun[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/workflows/ingestion/runs`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not load agent runs.");
+  }
+
+  return response.json();
+}
+
+export async function startIngestionRun(datasetKey: string): Promise<IngestionRun> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/workflows/ingestion/runs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dataset_key: datasetKey }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Agent workflow failed.");
+  }
+
+  return response.json();
+}
+
+export async function listOntologyModules(): Promise<OntologyModule[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/knowledge-graphs/ontology/modules`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not load ontology modules.");
   }
 
   return response.json();

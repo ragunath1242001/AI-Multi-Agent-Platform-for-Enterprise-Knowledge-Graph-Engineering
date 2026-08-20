@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     fuseki_password: str = "semanticops"
     knowledge_assets_dir: str = "../kg"
     cors_origins: list[str] = ["http://localhost:3000"]
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-5.6"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

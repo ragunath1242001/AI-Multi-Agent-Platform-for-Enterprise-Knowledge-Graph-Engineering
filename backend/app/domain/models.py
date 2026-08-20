@@ -41,12 +41,34 @@ class GraphSummary(BaseModel):
     graph_name: str
 
 
+class OntologyModuleSummary(BaseModel):
+    key: str
+    title: str
+    path: str
+    namespace: str
+    version: str | None = None
+    triple_count: int
+    class_count: int
+    object_property_count: int
+    datatype_property_count: int
+    turtle: str
+
+
 class SparqlQueryRequest(BaseModel):
     query: str = Field(..., min_length=1)
 
 
 class SparqlQueryResult(BaseModel):
     results: dict
+
+
+class NaturalLanguageQueryRequest(BaseModel):
+    question: str = Field(..., min_length=3, max_length=1000)
+
+
+class NaturalLanguageQueryResult(BaseModel):
+    query: str
+    explanation: str
 
 
 class IngestionDatasetSummary(BaseModel):
