@@ -13,7 +13,7 @@ Phase 2:
 - Implement LangGraph agents. Complete for ontology review, RDF preparation, validation, promotion, and observability.
 - Store workflow runs in PostgreSQL. Complete for built-in ingestion workflows.
 - Add ontology versioning. Complete with immutable checksums, named graphs, API history, and run provenance.
-- Add graph lineage. Complete for source checksums, validation reports, ontology versions, workflow runs, and promoted Fuseki graphs.
+- Add graph lineage. Complete for source checksums, validation reports, ontology versions, workflow runs, promoted Fuseki graphs, and interactive inspection.
 
 Phase 3:
 

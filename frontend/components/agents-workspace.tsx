@@ -10,14 +10,18 @@ import {
   type IngestionDataset,
   type IngestionRun,
 } from "@/lib/api";
+import { buildLineageStages } from "@/lib/lineage";
 
 export function AgentsWorkspace() {
   const [datasets, setDatasets] = useState<IngestionDataset[]>([]);
   const [runs, setRuns] = useState<IngestionRun[]>([]);
   const [selected, setSelected] = useState("");
   const [activeRun, setActiveRun] = useState<IngestionRun | null>(null);
+  const [selectedStage, setSelectedStage] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lineageStages = activeRun?.lineage ? buildLineageStages(activeRun.lineage) : [];
+  const lineageDetail = lineageStages[selectedStage];
 
   async function refresh() {
     try {
@@ -110,12 +114,37 @@ export function AgentsWorkspace() {
                 </p>
               ) : null}
               {activeRun.lineage ? (
-                <div className="lineage-summary">
-                  <span>Source: {activeRun.lineage.source_uri}</span>
-                  <span>SHA-256: {activeRun.lineage.source_checksum.slice(0, 12)}</span>
-                  <span>Graph: {activeRun.lineage.graph_iri}</span>
-                  <span>Promoted: {new Date(activeRun.lineage.promoted_at).toLocaleString()}</span>
-                </div>
+                <section className="lineage-graph" aria-label="Promotion lineage">
+                  <h4>Promotion lineage</h4>
+                  <div className="lineage-track">
+                    {lineageStages.map((stage, index) => (
+                      <div className="lineage-hop" key={stage.id}>
+                        <button
+                          type="button"
+                          className={`lineage-node${selectedStage === index ? " active" : ""}`}
+                          aria-pressed={selectedStage === index}
+                          onClick={() => setSelectedStage(index)}
+                        >
+                          <strong>{stage.label}</strong>
+                          <span>{stage.summary}</span>
+                        </button>
+                        {index < lineageStages.length - 1 ? (
+                          <span className="lineage-arrow" aria-hidden="true">→</span>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                  {lineageDetail ? (
+                    <dl className="lineage-detail" aria-live="polite">
+                      {lineageDetail.details.map((detail) => (
+                        <div key={detail.label}>
+                          <dt>{detail.label}</dt>
+                          <dd>{detail.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                </section>
               ) : null}
             </>
           ) : (

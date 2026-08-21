@@ -12,7 +12,7 @@ Enterprise knowledge graph delivery often requires separate tools and manual han
 - register immutable ontology versions and link them to workflow runs;
 - trace every promoted graph to its source checksum, validation report, ontology versions, and workflow run;
 - retain validation reports and ingestion history;
-- inspect graph inventory and workflow health from a web interface; and
+- inspect graph inventory, interactive promotion lineage, and workflow health from a web interface; and
 - translate natural-language questions into reviewable, read-only SPARQL when OpenAI access is configured.
 
 ## Architecture

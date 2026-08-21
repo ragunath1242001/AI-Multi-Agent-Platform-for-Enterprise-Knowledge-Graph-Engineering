@@ -633,6 +633,7 @@ select {
 
 .run-details {
   border-left: 1px solid var(--line);
+  min-width: 0;
   padding-left: 16px;
 }
 
@@ -669,16 +670,77 @@ select {
   padding-top: 6px;
 }
 
-.lineage-summary {
+.lineage-graph {
+  margin-top: 16px;
+}
+
+.lineage-graph h4 {
+  margin: 0 0 10px;
+}
+
+.lineage-track,
+.lineage-hop {
+  align-items: center;
+  display: flex;
+}
+
+.lineage-track {
+  overflow-x: auto;
+  padding: 2px 2px 12px;
+}
+
+.lineage-hop {
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.lineage-node {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  min-height: 64px;
+  padding: 10px;
+  text-align: left;
+  width: 132px;
+}
+
+.lineage-node span,
+.lineage-detail dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.lineage-node.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.lineage-arrow {
+  color: var(--muted);
+  font-size: 20px;
+  margin-right: 8px;
+}
+
+.lineage-detail {
   background: var(--surface-muted);
   border-radius: 8px;
-  color: var(--muted);
   display: grid;
-  font-size: 13px;
-  gap: 6px;
-  margin-top: 12px;
-  overflow-wrap: anywhere;
+  gap: 8px;
+  margin: 0;
   padding: 12px;
+}
+
+.lineage-detail div {
+  display: grid;
+  gap: 2px;
+}
+
+.lineage-detail dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .recent-runs {
