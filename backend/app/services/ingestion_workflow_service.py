@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
+from uuid import UUID
+
+from semanticops_agents.graph.workflow import build_graph_engineering_workflow
+from semanticops_agents.state import PromotionOutcome, ValidationOutcome
 
 from app.domain.models import IngestionDatasetSummary, IngestionRunResult, IngestionStep
 from app.infrastructure.persistence.validation_report_repository import ValidationReportRepository
@@ -71,62 +75,61 @@ class IngestionWorkflowService:
             dataset_key=dataset.key,
             graph_name=dataset.graph_name,
         )
-        steps: list[IngestionStep] = []
 
         try:
-            data_graph_ttl = self._read_asset(dataset.relative_path)
-            steps.append(
-                IngestionStep(
-                    name="ingest",
-                    status="completed",
-                    detail=f"Loaded {dataset.relative_path}.",
-                )
+            workflow = build_graph_engineering_workflow(
+                validate_graph=self._validate,
+                promote_graph=self._promote,
             )
+            result = await workflow.ainvoke(
+                {
+                    "graph_name": dataset.graph_name,
+                    "source_path": dataset.relative_path,
+                    "source_text": self._read_asset(dataset.relative_path),
+                    "ontology_ttl": self._read_ontologies(),
+                    "shacl_shapes_ttl": self._read_shapes(),
+                }
+            )
+            steps = [IngestionStep(**step) for step in result["steps"]]
 
-            shapes_ttl = self._read_shapes()
-            validation = self._validation_service.validate(
-                graph_name=dataset.graph_name,
-                data_graph_ttl=data_graph_ttl,
-                shacl_shapes_ttl=shapes_ttl,
-            )
-            steps.append(
-                IngestionStep(
-                    name="validate",
-                    status="completed" if validation.conforms else "failed",
-                    detail="SHACL conforms." if validation.conforms else validation.report_text,
+            if error := result.get("error"):
+                return self._run_repository.fail(run.id, steps, error)
+            if not result.get("validation_conforms"):
+                return self._run_repository.fail(
+                    run.id,
+                    steps,
+                    result.get("shacl_report", "SHACL validation failed."),
                 )
-            )
-            if not validation.conforms:
-                return self._run_repository.fail(run.id, steps, validation.report_text)
 
-            promotion = await self._graph_store_service.upsert_graph(
-                graph_name=dataset.graph_name,
-                data_graph_ttl=data_graph_ttl,
-            )
-            steps.append(
-                IngestionStep(
-                    name="promote",
-                    status="completed",
-                    detail=f"Promoted {promotion.triple_count} triples to {promotion.graph_iri}.",
-                )
-            )
-
-            steps.append(
-                IngestionStep(
-                    name="query_ready",
-                    status="completed",
-                    detail="Named graph is available for SPARQL queries.",
-                )
-            )
             return self._run_repository.complete(
                 run_id=run.id,
                 steps=steps,
-                validation_report_id=validation.id,
-                triple_count=promotion.triple_count,
+                validation_report_id=UUID(result["validation_report_id"]),
+                triple_count=result["triple_count"],
             )
         except Exception as exc:
-            steps.append(IngestionStep(name="error", status="failed", detail=str(exc)))
+            steps = [IngestionStep(name="error", status="failed", detail=str(exc))]
             return self._run_repository.fail(run.id, steps, str(exc))
+
+    def _validate(
+        self,
+        graph_name: str,
+        data_graph_ttl: str,
+        shacl_shapes_ttl: str,
+    ) -> ValidationOutcome:
+        result = self._validation_service.validate(
+            graph_name=graph_name,
+            data_graph_ttl=data_graph_ttl,
+            shacl_shapes_ttl=shacl_shapes_ttl,
+        )
+        return ValidationOutcome(str(result.id), result.conforms, result.report_text)
+
+    async def _promote(self, graph_name: str, data_graph_ttl: str) -> PromotionOutcome:
+        result = await self._graph_store_service.upsert_graph(
+            graph_name=graph_name,
+            data_graph_ttl=data_graph_ttl,
+        )
+        return PromotionOutcome(result.graph_iri, result.triple_count)
 
     def _dataset(self, dataset_key: str) -> IngestionDatasetDefinition:
         for dataset in DATASETS:
@@ -144,3 +147,9 @@ class IngestionWorkflowService:
         core_shapes = self._read_asset("shapes/semanticops-core.shacl.ttl")
         medical_shapes = self._read_asset("shapes/semanticops-medical.shacl.ttl")
         return f"{core_shapes}\n{medical_shapes}"
+
+    def _read_ontologies(self) -> str:
+        ontology_dir = self._assets_dir / "ontologies"
+        return "\n".join(
+            path.read_text(encoding="utf-8-sig") for path in sorted(ontology_dir.glob("*.ttl"))
+        )

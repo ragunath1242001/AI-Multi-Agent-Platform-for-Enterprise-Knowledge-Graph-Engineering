@@ -9,7 +9,11 @@ from app.main import create_app
 
 
 class FakeGraphStoreService:
+    def __init__(self) -> None:
+        self.promoted: list[str] = []
+
     async def upsert_graph(self, graph_name: str, data_graph_ttl: str) -> GraphStoreResult:
+        self.promoted.append(graph_name)
         return GraphStoreResult(
             graph_name=graph_name,
             graph_iri=f"https://semanticops.ai/graphs/{graph_name}",
@@ -56,8 +60,9 @@ so:KnowledgeAssetShape a sh:NodeShape ;
     monkeypatch.setenv("KNOWLEDGE_ASSETS_DIR", str(assets_dir))
     get_settings.cache_clear()
 
+    graph_store = FakeGraphStoreService()
     app = create_app()
-    app.dependency_overrides[get_graph_store_service] = FakeGraphStoreService
+    app.dependency_overrides[get_graph_store_service] = lambda: graph_store
 
     with TestClient(app) as client:
         datasets_response = client.get("/api/v1/workflows/ingestion/datasets")
@@ -72,12 +77,36 @@ so:KnowledgeAssetShape a sh:NodeShape ;
         run = run_response.json()
         assert run["status"] == "completed"
         assert [step["name"] for step in run["steps"]] == [
-            "ingest",
-            "validate",
-            "promote",
-            "query_ready",
+            "ontology",
+            "rdf_generation",
+            "validation",
+            "promotion",
+            "observability",
         ]
+        assert graph_store.promoted == ["synthetic-medical-cohort"]
+
+        (assets_dir / "examples" / "synthetic-medical-cohort.ttl").write_text(
+            """@prefix so: <https://semanticops.ai/ontology/core#> .
+@prefix ex: <https://semanticops.ai/example/> .
+ex:asset a so:KnowledgeAsset .
+""",
+            encoding="utf-8",
+        )
+        failed_response = client.post(
+            "/api/v1/workflows/ingestion/runs",
+            json={"dataset_key": "synthetic-medical-cohort"},
+        )
+        assert failed_response.status_code == 200
+        failed = failed_response.json()
+        assert failed["status"] == "failed"
+        assert [step["name"] for step in failed["steps"]] == [
+            "ontology",
+            "rdf_generation",
+            "validation",
+            "observability",
+        ]
+        assert graph_store.promoted == ["synthetic-medical-cohort"]
 
         runs_response = client.get("/api/v1/workflows/ingestion/runs")
         assert runs_response.status_code == 200
-        assert runs_response.json()[0]["id"] == run["id"]
+        assert runs_response.json()[0]["id"] == failed["id"]

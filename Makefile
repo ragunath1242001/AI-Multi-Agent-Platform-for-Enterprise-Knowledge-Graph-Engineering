@@ -1,8 +1,8 @@
 .PHONY: install dev streamlit test lint format docker-up docker-down
 
 install:
-	cd backend && python -m pip install -e ".[dev]"
 	cd agents && python -m pip install -e ".[dev]"
+	cd backend && python -m pip install -e ".[dev]"
 	python -m pip install -r streamlit_app/requirements.txt
 	cd frontend && pnpm install
 

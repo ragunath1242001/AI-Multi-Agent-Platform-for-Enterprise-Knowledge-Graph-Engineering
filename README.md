@@ -24,7 +24,7 @@ flowchart LR
     Console --> API
 
     subgraph Application[SemanticOps application layer]
-        API --> Workflow[Ingestion workflow]
+        API --> Workflow[LangGraph ingestion workflow]
         API --> Validation[SHACL validation service]
         API --> Graph[Graph store service]
         API --> Translation[Query translation service]
@@ -38,7 +38,6 @@ flowchart LR
     Graph --> Fuseki[(Apache Jena Fuseki<br/>RDF named graphs and SPARQL)]
     Translation --> OpenAI[OpenAI Responses API<br/>optional]
 
-    AgentPackage[LangGraph agent package] -. typed orchestration workflow .-> Assets
 ```
 
 ### Knowledge graph delivery flow
@@ -57,11 +56,11 @@ Natural-language querying is an optional path. The generated SPARQL is returned 
 | Concern | Implementation |
 | --- | --- |
 | User experience | Next.js workspaces for operations, ingestion, ontology inspection, validation, observability, and the end-to-end demo |
-| API and orchestration | FastAPI routes delegate validation, graph storage, query translation, and deterministic ingestion to application services |
+| API and orchestration | FastAPI runs a typed LangGraph workflow that reuses the existing validation and graph-store services |
 | Semantic governance | OWL/RDFS ontologies and SHACL shapes are stored as Turtle under `kg/` and validated with RDFLib and pySHACL |
 | Graph persistence | Fuseki stores named RDF graphs and provides the SPARQL endpoint |
 | Operational persistence | PostgreSQL records validation reports and ingestion workflow runs |
-| Agent foundation | A typed LangGraph workflow defines ontology, RDF generation, validation, and reasoning nodes for further orchestration |
+| Agent orchestration | LangGraph executes ontology review, RDF preparation, validation, promotion, and observability with conditional failure routing |
 | AI-assisted querying | The OpenAI Responses API generates structured SPARQL translations that are checked for read-only operations |
 | Deployment | Docker Compose builds and connects the frontend, backend, PostgreSQL, and Fuseki services |
 
