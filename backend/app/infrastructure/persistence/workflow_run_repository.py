@@ -6,6 +6,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
 from app.domain.models import IngestionRunResult, IngestionStep
+from app.infrastructure.persistence.graph_lineage_repository import GraphLineageRepository
 from app.infrastructure.persistence.ontology_version_repository import OntologyVersionRepository
 from app.infrastructure.persistence.workflow_run_ontology_version_record import (
     WorkflowRunOntologyVersionRecord,
@@ -16,6 +17,7 @@ from app.infrastructure.persistence.workflow_run_record import WorkflowRunRecord
 class WorkflowRunRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
+        self._lineage = GraphLineageRepository(session)
         self._ontology_versions = OntologyVersionRepository(session)
 
     def create_started(self, dataset_key: str, graph_name: str) -> IngestionRunResult:
@@ -36,6 +38,9 @@ class WorkflowRunRepository:
         steps: list[IngestionStep],
         validation_report_id: UUID,
         triple_count: int,
+        source_uri: str,
+        source_checksum: str,
+        graph_iri: str,
     ) -> IngestionRunResult:
         record = self._get(run_id)
         record.status = "completed"
@@ -44,6 +49,13 @@ class WorkflowRunRepository:
         record.triple_count = triple_count
         record.error = None
         record.updated_at = datetime.now(UTC)
+        self._lineage.add(
+            workflow_run_id=run_id,
+            source_uri=source_uri,
+            source_checksum=source_checksum,
+            graph_iri=graph_iri,
+            triple_count=triple_count,
+        )
         self._session.commit()
         self._session.refresh(record)
         return self._to_result(record)
@@ -95,6 +107,7 @@ class WorkflowRunRepository:
             if record.validation_report_id
             else None,
             ontology_versions=self._ontology_versions.list_for_run(record.id),
+            lineage=self._lineage.find_for_run(record.id),
             triple_count=record.triple_count,
             error=record.error,
             created_at=record.created_at,

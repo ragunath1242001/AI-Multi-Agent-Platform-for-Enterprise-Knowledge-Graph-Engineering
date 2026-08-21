@@ -55,6 +55,7 @@ export type IngestionRun = {
   steps: { name: string; status: string; detail: string }[];
   validation_report_id?: string | null;
   ontology_versions: OntologyVersion[];
+  lineage: GraphLineage | null;
   triple_count: number | null;
   error: string | null;
   created_at: string;
@@ -85,6 +86,19 @@ export type OntologyVersion = {
   graph_iri: string;
   triple_count: number;
   created_at: string;
+};
+
+export type GraphLineage = {
+  workflow_run_id: string;
+  dataset_key: string;
+  graph_name: string;
+  source_uri: string;
+  source_checksum: string;
+  validation_report_id: string;
+  ontology_versions: OntologyVersion[];
+  graph_iri: string;
+  triple_count: number;
+  promoted_at: string;
 };
 
 export async function getHealth(): Promise<{ status: string; service: string }> {
@@ -242,6 +256,19 @@ export async function listOntologyVersions(): Promise<OntologyVersion[]> {
 
   if (!response.ok) {
     throw new Error("Could not load ontology version history.");
+  }
+
+  return response.json();
+}
+
+export async function listGraphLineage(graphName: string): Promise<GraphLineage[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/knowledge-graphs/lineage/${encodeURIComponent(graphName)}`,
+    { cache: "no-store" },
+  );
+
+  if (!response.ok) {
+    throw new Error("Could not load graph lineage.");
   }
 
   return response.json();

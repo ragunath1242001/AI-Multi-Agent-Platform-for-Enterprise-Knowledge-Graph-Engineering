@@ -7,6 +7,7 @@ Implemented tables:
 - `workflow_runs`
 - `ontology_versions`
 - `workflow_run_ontology_versions`
+- `graph_lineage`
 - `validation_reports`
 
 Candidate tables:

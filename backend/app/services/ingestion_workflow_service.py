@@ -93,6 +93,8 @@ class IngestionWorkflowService:
                 run.id,
                 [version.id for version in ontology_versions],
             )
+            source_ttl = self._read_asset(dataset.relative_path)
+            source_checksum = sha256(source_ttl.encode()).hexdigest()
             workflow = build_graph_engineering_workflow(
                 validate_graph=self._validate,
                 promote_graph=self._promote,
@@ -101,7 +103,7 @@ class IngestionWorkflowService:
                 {
                     "graph_name": dataset.graph_name,
                     "source_path": dataset.relative_path,
-                    "source_text": self._read_asset(dataset.relative_path),
+                    "source_text": source_ttl,
                     "ontology_ttl": ontology_ttl,
                     "shacl_shapes_ttl": self._read_shapes(),
                 }
@@ -122,6 +124,9 @@ class IngestionWorkflowService:
                 steps=steps,
                 validation_report_id=UUID(result["validation_report_id"]),
                 triple_count=result["triple_count"],
+                source_uri=dataset.relative_path,
+                source_checksum=source_checksum,
+                graph_iri=result["graph_iri"],
             )
         except Exception as exc:
             steps = [IngestionStep(name="error", status="failed", detail=str(exc))]

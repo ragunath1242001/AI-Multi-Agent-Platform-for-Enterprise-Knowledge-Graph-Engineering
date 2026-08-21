@@ -9,6 +9,7 @@ Initial endpoints:
 - `GET /api/v1/knowledge-graphs/validation-reports`: list recent persisted validation reports.
 - `GET /api/v1/knowledge-graphs/ontology/modules`: inspect the current ontology source modules.
 - `GET /api/v1/knowledge-graphs/ontology/versions`: list immutable ontology snapshots and checksums.
+- `GET /api/v1/knowledge-graphs/lineage/{graph_name}`: trace successful promotions from source checksum through validation and ontology versions to the Fuseki graph.
 - `PUT /api/v1/knowledge-graphs/graphs`: promote approved Turtle into a named graph.
 - `GET /api/v1/knowledge-graphs/graphs`: list named graphs currently stored in Fuseki.
 - `POST /api/v1/knowledge-graphs/query`: execute a SPARQL query against Fuseki.

@@ -91,6 +91,20 @@ so:KnowledgeAssetShape a sh:NodeShape ;
         assert len(graph_store.promoted) == 3
         assert len(run["ontology_versions"]) == 2
         assert all(len(version["checksum"]) == 64 for version in run["ontology_versions"])
+        assert run["lineage"]["workflow_run_id"] == run["id"]
+        assert run["lineage"]["source_uri"] == "examples/synthetic-medical-cohort.ttl"
+        assert len(run["lineage"]["source_checksum"]) == 64
+        assert run["lineage"]["validation_report_id"] == run["validation_report_id"]
+        assert run["lineage"]["graph_iri"] == (
+            "https://semanticops.ai/graphs/synthetic-medical-cohort"
+        )
+        assert len(run["lineage"]["ontology_versions"]) == 2
+
+        lineage_response = client.get(
+            "/api/v1/knowledge-graphs/lineage/synthetic-medical-cohort"
+        )
+        assert lineage_response.status_code == 200
+        assert [item["workflow_run_id"] for item in lineage_response.json()] == [run["id"]]
 
         versions_response = client.get("/api/v1/knowledge-graphs/ontology/versions")
         assert versions_response.status_code == 200
@@ -110,6 +124,7 @@ ex:asset a so:KnowledgeAsset .
         assert failed_response.status_code == 200
         failed = failed_response.json()
         assert failed["status"] == "failed"
+        assert failed["lineage"] is None
         assert [step["name"] for step in failed["steps"]] == [
             "ontology",
             "rdf_generation",
@@ -120,6 +135,11 @@ ex:asset a so:KnowledgeAsset .
         assert [version["id"] for version in failed["ontology_versions"]] == [
             version["id"] for version in run["ontology_versions"]
         ]
+        assert len(
+            client.get(
+                "/api/v1/knowledge-graphs/lineage/synthetic-medical-cohort"
+            ).json()
+        ) == 1
 
         runs_response = client.get("/api/v1/workflows/ingestion/runs")
         assert runs_response.status_code == 200

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.settings import get_settings
 from app.domain.models import (
+    GraphLineageSummary,
     GraphStoreResult,
     GraphSummary,
     GraphUpsertRequest,
@@ -25,6 +26,7 @@ from app.domain.models import (
 )
 from app.infrastructure.database import get_session
 from app.infrastructure.graph.fuseki_client import FusekiClient
+from app.infrastructure.persistence.graph_lineage_repository import GraphLineageRepository
 from app.infrastructure.persistence.ontology_version_repository import OntologyVersionRepository
 from app.infrastructure.persistence.validation_report_repository import ValidationReportRepository
 from app.services.graph_store_service import GraphStoreService
@@ -89,6 +91,14 @@ async def list_ontology_modules() -> list[OntologyModuleSummary]:
 @router.get("/ontology/versions", response_model=list[OntologyVersionSummary])
 async def list_ontology_versions(session: SessionDependency) -> list[OntologyVersionSummary]:
     return OntologyVersionRepository(session).list_recent()
+
+
+@router.get("/lineage/{graph_name}", response_model=list[GraphLineageSummary])
+async def list_graph_lineage(
+    graph_name: str,
+    session: SessionDependency,
+) -> list[GraphLineageSummary]:
+    return GraphLineageRepository(session).list_for_graph(graph_name)
 
 
 @router.post("/validate", response_model=GraphValidationResult)

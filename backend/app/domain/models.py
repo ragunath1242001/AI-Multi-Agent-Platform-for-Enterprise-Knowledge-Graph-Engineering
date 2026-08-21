@@ -67,6 +67,19 @@ class OntologyVersionSummary(BaseModel):
     created_at: datetime
 
 
+class GraphLineageSummary(BaseModel):
+    workflow_run_id: UUID
+    dataset_key: str
+    graph_name: str
+    source_uri: str
+    source_checksum: str
+    validation_report_id: UUID
+    ontology_versions: list[OntologyVersionSummary] = Field(default_factory=list)
+    graph_iri: str
+    triple_count: int
+    promoted_at: datetime
+
+
 class SparqlQueryRequest(BaseModel):
     query: str = Field(..., min_length=1)
 
@@ -109,6 +122,7 @@ class IngestionRunResult(BaseModel):
     steps: list[IngestionStep]
     validation_report_id: UUID | None = None
     ontology_versions: list[OntologyVersionSummary] = Field(default_factory=list)
+    lineage: GraphLineageSummary | None = None
     triple_count: int | None = None
     error: str | None = None
     created_at: datetime

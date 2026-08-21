@@ -669,6 +669,18 @@ select {
   padding-top: 6px;
 }
 
+.lineage-summary {
+  background: var(--surface-muted);
+  border-radius: 8px;
+  color: var(--muted);
+  display: grid;
+  font-size: 13px;
+  gap: 6px;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+  padding: 12px;
+}
+
 .recent-runs {
   border-top: 1px solid var(--line);
   margin-top: 18px;

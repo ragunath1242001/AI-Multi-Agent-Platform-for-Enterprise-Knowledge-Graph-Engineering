@@ -109,6 +109,14 @@ export function AgentsWorkspace() {
                   )).join(", ")}
                 </p>
               ) : null}
+              {activeRun.lineage ? (
+                <div className="lineage-summary">
+                  <span>Source: {activeRun.lineage.source_uri}</span>
+                  <span>SHA-256: {activeRun.lineage.source_checksum.slice(0, 12)}</span>
+                  <span>Graph: {activeRun.lineage.graph_iri}</span>
+                  <span>Promoted: {new Date(activeRun.lineage.promoted_at).toLocaleString()}</span>
+                </div>
+              ) : null}
             </>
           ) : (
             <p className="empty-text">Choose a dataset and run the agent workflow.</p>

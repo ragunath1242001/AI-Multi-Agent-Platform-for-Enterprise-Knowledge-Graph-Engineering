@@ -22,6 +22,7 @@ def get_session_factory() -> sessionmaker[Session]:
 
 
 def initialize_database() -> None:
+    from app.infrastructure.persistence.graph_lineage_record import GraphLineageRecord
     from app.infrastructure.persistence.ontology_version_record import OntologyVersionRecord
     from app.infrastructure.persistence.validation_report_record import ValidationReportRecord
     from app.infrastructure.persistence.workflow_run_ontology_version_record import (
@@ -29,6 +30,7 @@ def initialize_database() -> None:
     )
     from app.infrastructure.persistence.workflow_run_record import WorkflowRunRecord
 
+    _ = GraphLineageRecord
     _ = OntologyVersionRecord
     _ = ValidationReportRecord
     _ = WorkflowRunOntologyVersionRecord

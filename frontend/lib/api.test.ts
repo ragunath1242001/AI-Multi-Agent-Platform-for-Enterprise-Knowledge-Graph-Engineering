@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   listIngestionDatasets,
+  listGraphLineage,
   listOntologyVersions,
   startIngestionRun,
   translateNaturalLanguageQuery,
@@ -18,12 +19,14 @@ describe("agent workflow API", () => {
     await startIngestionRun("sample");
     await translateNaturalLanguageQuery("Show all graphs");
     await listOntologyVersions();
+    await listGraphLineage("sample graph");
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       "http://localhost:8000/api/v1/workflows/ingestion/datasets",
       "http://localhost:8000/api/v1/workflows/ingestion/runs",
       "http://localhost:8000/api/v1/knowledge-graphs/translate-query",
       "http://localhost:8000/api/v1/knowledge-graphs/ontology/versions",
+      "http://localhost:8000/api/v1/knowledge-graphs/lineage/sample%20graph",
     ]);
   });
 });
