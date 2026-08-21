@@ -1,37 +1,183 @@
 # SemanticOps
 
-SemanticOps is a production-oriented monorepo for an AI-powered multi-agent platform for enterprise knowledge graph engineering.
+SemanticOps is an enterprise knowledge graph engineering platform for turning RDF assets into validated, governed, and query-ready named graphs. It combines a Next.js operations interface, a FastAPI application layer, SHACL validation, Apache Jena Fuseki, PostgreSQL, and a reusable LangGraph orchestration package.
 
-## Modules
+## Objective
 
-- `frontend/`: Next.js TypeScript web application.
-- `backend/`: FastAPI API using clean architecture boundaries.
-- `agents/`: LangGraph-based orchestration package.
-- `kg/`: OWL ontologies, SHACL shapes, and sample RDF.
-- `streamlit_app/`: Streamlit operations console for validation, graph visualization, graph promotion, and SPARQL.
-- `docker/`: Runtime service configuration.
-- `docs/`: Architecture and engineering documentation.
-- `tests/`: Cross-service integration tests.
+Enterprise knowledge graph delivery often requires separate tools and manual hand-offs for ontology management, RDF preparation, validation, promotion, querying, and operational tracking. SemanticOps brings those activities into one workflow so teams can:
 
-## Quick Start
+- manage ontology and SHACL assets as version-controlled code;
+- validate RDF before it reaches the graph store;
+- promote approved data into queryable named graphs;
+- retain validation reports and ingestion history;
+- inspect graph inventory and workflow health from a web interface; and
+- translate natural-language questions into reviewable, read-only SPARQL when OpenAI access is configured.
 
-```bash
-cp .env.example .env
-docker compose up --build
+## Architecture
+
+```mermaid
+flowchart LR
+    User[Knowledge engineer] --> Web[Next.js web application<br/>localhost:3001]
+    Operator[Platform operator] --> Console[Optional Streamlit console<br/>localhost:8501]
+
+    Web --> API[FastAPI API<br/>localhost:8001]
+    Console --> API
+
+    subgraph Application[SemanticOps application layer]
+        API --> Workflow[Ingestion workflow]
+        API --> Validation[SHACL validation service]
+        API --> Graph[Graph store service]
+        API --> Translation[Query translation service]
+        Workflow --> Assets[Ontology, RDF, and SHACL assets]
+        Workflow --> Validation
+        Workflow --> Graph
+    end
+
+    Validation --> PostgreSQL[(PostgreSQL<br/>reports and workflow runs)]
+    Workflow --> PostgreSQL
+    Graph --> Fuseki[(Apache Jena Fuseki<br/>RDF named graphs and SPARQL)]
+    Translation --> OpenAI[OpenAI Responses API<br/>optional]
+
+    AgentPackage[LangGraph agent package] -. typed orchestration workflow .-> Assets
 ```
 
-Services:
+### Knowledge graph delivery flow
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000/docs
-- Fuseki: http://localhost:3030
-- PostgreSQL: localhost:5432
+1. Select a registered RDF dataset or submit Turtle through the API or user interface.
+2. Load the corresponding ontology and SHACL shapes from `kg/`.
+3. Parse the RDF and evaluate SHACL constraints with RDFS inference.
+4. Persist the validation result and workflow state in PostgreSQL.
+5. Promote conforming RDF to an isolated named graph in Fuseki.
+6. Query the promoted graph with SPARQL and monitor the outcome from the observability workspace.
 
-## Streamlit Console
+Natural-language querying is an optional path. The generated SPARQL is returned for inspection, restricted to read-only query forms, and executed only when the user chooses to run it.
 
-```bash
+## How the objective is achieved
+
+| Concern | Implementation |
+| --- | --- |
+| User experience | Next.js workspaces for operations, ingestion, ontology inspection, validation, observability, and the end-to-end demo |
+| API and orchestration | FastAPI routes delegate validation, graph storage, query translation, and deterministic ingestion to application services |
+| Semantic governance | OWL/RDFS ontologies and SHACL shapes are stored as Turtle under `kg/` and validated with RDFLib and pySHACL |
+| Graph persistence | Fuseki stores named RDF graphs and provides the SPARQL endpoint |
+| Operational persistence | PostgreSQL records validation reports and ingestion workflow runs |
+| Agent foundation | A typed LangGraph workflow defines ontology, RDF generation, validation, and reasoning nodes for further orchestration |
+| AI-assisted querying | The OpenAI Responses API generates structured SPARQL translations that are checked for read-only operations |
+| Deployment | Docker Compose builds and connects the frontend, backend, PostgreSQL, and Fuseki services |
+
+## Repository structure
+
+| Path | Purpose |
+| --- | --- |
+| `frontend/` | Next.js and TypeScript web application |
+| `backend/` | FastAPI API, application services, persistence, and Fuseki integration |
+| `agents/` | LangGraph workflow and agent state definitions |
+| `kg/` | Ontologies, SHACL shapes, and example RDF datasets |
+| `streamlit_app/` | Optional operations and graph visualization console |
+| `tests/` | Cross-service contract tests |
+| `docs/` | Detailed architecture and engineering documentation |
+| `docker/` | Supporting runtime configuration |
+
+## Run the platform
+
+### Prerequisites
+
+- Docker Desktop with Docker Compose
+- Git
+- An OpenAI API key only if natural-language-to-SPARQL translation is required
+
+### 1. Configure the environment
+
+From the repository root:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+The stack runs without an OpenAI key. To enable natural-language query translation, set `OPENAI_API_KEY` in `.env`; change `OPENAI_MODEL` there only when another available model is required.
+
+### 2. Build and start all services
+
+```powershell
+docker compose up -d --build
+docker compose ps
+```
+
+### 3. Verify the deployment
+
+```powershell
+Invoke-RestMethod http://localhost:8001/api/v1/health
+```
+
+Expected response:
+
+```text
+status service
+------ -------
+ok     semanticops-backend
+```
+
+Open the running services:
+
+| Service | URL |
+| --- | --- |
+| SemanticOps web application | http://localhost:3001 |
+| API documentation | http://localhost:8001/docs |
+| Fuseki administration | http://localhost:3031 |
+| PostgreSQL | `localhost:5433` |
+
+### 4. Run the end-to-end workflow
+
+Open http://localhost:3001/demo and select **Run full demo**. The demo loads ontology modules, runs ingestion for the synthetic medical cohort, validates the graph, promotes it to Fuseki, executes a SPARQL query, and refreshes the persisted operational metrics.
+
+The same ingestion workflow can be started directly from PowerShell:
+
+```powershell
+$body = @{ dataset_key = "synthetic-medical-cohort" } | ConvertTo-Json
+Invoke-RestMethod `
+  -Method Post `
+  -Uri http://localhost:8001/api/v1/workflows/ingestion/runs `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+### 5. Stop the platform
+
+```powershell
+docker compose down
+```
+
+Add `--volumes` only when the PostgreSQL and Fuseki development data should also be removed.
+
+## Optional Streamlit console
+
+The Streamlit console provides graph visualization, manual validation, graph promotion, medical dataset loading, and direct SPARQL execution. Run it after the Compose stack is healthy:
+
+```powershell
 python -m pip install -r streamlit_app/requirements.txt
-streamlit run streamlit_app/app.py
+$env:SEMANTICOPS_API_URL = "http://localhost:8001"
+python -m streamlit run streamlit_app/app.py
 ```
 
-By default, the console uses the backend at `http://localhost:8000`.
+Then open http://localhost:8501.
+
+## Development checks
+
+Install local dependencies with `make install` where GNU Make is available, or use the package commands directly. Run the complete check set with:
+
+```powershell
+Push-Location backend
+python -m pytest
+python -m ruff check app tests
+Pop-Location
+
+Push-Location agents
+python -m pytest
+python -m ruff check semanticops_agents tests
+Pop-Location
+
+pnpm --dir frontend test
+pnpm --dir frontend lint
+```
+
+See [`docs/`](docs/) for the detailed architecture, data model, API, deployment, and testing documentation.
