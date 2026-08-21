@@ -6,12 +6,17 @@ from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
 from app.domain.models import IngestionRunResult, IngestionStep
+from app.infrastructure.persistence.ontology_version_repository import OntologyVersionRepository
+from app.infrastructure.persistence.workflow_run_ontology_version_record import (
+    WorkflowRunOntologyVersionRecord,
+)
 from app.infrastructure.persistence.workflow_run_record import WorkflowRunRecord
 
 
 class WorkflowRunRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
+        self._ontology_versions = OntologyVersionRepository(session)
 
     def create_started(self, dataset_key: str, graph_name: str) -> IngestionRunResult:
         record = WorkflowRunRecord(
@@ -43,6 +48,16 @@ class WorkflowRunRepository:
         self._session.refresh(record)
         return self._to_result(record)
 
+    def link_ontology_versions(self, run_id: UUID, version_ids: list[UUID]) -> None:
+        self._session.add_all(
+            WorkflowRunOntologyVersionRecord(
+                workflow_run_id=str(run_id),
+                ontology_version_id=str(version_id),
+            )
+            for version_id in version_ids
+        )
+        self._session.commit()
+
     def fail(self, run_id: UUID, steps: list[IngestionStep], error: str) -> IngestionRunResult:
         record = self._get(run_id)
         record.status = "failed"
@@ -67,9 +82,9 @@ class WorkflowRunRepository:
             raise ValueError(f"Workflow run not found: {run_id}")
         return record
 
-    @staticmethod
-    def _to_result(record: WorkflowRunRecord) -> IngestionRunResult:
+    def _to_result(self, record: WorkflowRunRecord) -> IngestionRunResult:
         steps_payload = json.loads(record.steps_json or "[]")
+        # ponytail: recent runs are capped at 20; preload this relation if that limit grows.
         return IngestionRunResult(
             id=UUID(record.id),
             dataset_key=record.dataset_key,
@@ -79,6 +94,7 @@ class WorkflowRunRepository:
             validation_report_id=UUID(record.validation_report_id)
             if record.validation_report_id
             else None,
+            ontology_versions=self._ontology_versions.list_for_run(record.id),
             triple_count=record.triple_count,
             error=record.error,
             created_at=record.created_at,

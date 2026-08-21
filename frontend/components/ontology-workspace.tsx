@@ -2,21 +2,30 @@
 
 import { useEffect, useState } from "react";
 
-import { listOntologyModules, type OntologyModule } from "@/lib/api";
+import {
+  listOntologyModules,
+  listOntologyVersions,
+  type OntologyModule,
+  type OntologyVersion,
+} from "@/lib/api";
 
 export function OntologyWorkspace() {
   const [modules, setModules] = useState<OntologyModule[]>([]);
+  const [versions, setVersions] = useState<OntologyVersion[]>([]);
   const [selected, setSelected] = useState<OntologyModule | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    listOntologyModules()
-      .then((items) => {
+    Promise.all([listOntologyModules(), listOntologyVersions()])
+      .then(([items, history]) => {
         setModules(items);
+        setVersions(history);
         setSelected(items[0] ?? null);
       })
       .catch((caught) => setError(caught instanceof Error ? caught.message : "Could not load ontologies."));
   }, []);
+
+  const selectedVersions = versions.filter((version) => version.ontology_key === selected?.key);
 
   return (
     <div className="ontology-layout">
@@ -54,6 +63,23 @@ export function OntologyWorkspace() {
               <div><strong>{selected.triple_count}</strong><span>Triples</span></div>
             </div>
             <p className="ontology-path">{selected.path}</p>
+            <section className="ontology-versions">
+              <div className="section-heading">
+                <h3>Immutable versions</h3>
+                <span>{selectedVersions.length} registered</span>
+              </div>
+              <div className="activity-list">
+                {selectedVersions.length ? selectedVersions.map((version) => (
+                  <article key={version.id}>
+                    <div>
+                      <strong>v{version.version ?? "unversioned"}</strong>
+                      <span>{version.checksum.slice(0, 12)} - {version.triple_count} triples</span>
+                    </div>
+                    <span className="status-badge completed">Immutable</span>
+                  </article>
+                )) : <p className="empty-text">Run ingestion to register this ontology.</p>}
+              </div>
+            </section>
             <pre>{selected.turtle}</pre>
           </>
         ) : (

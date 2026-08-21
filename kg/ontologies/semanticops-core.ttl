@@ -3,7 +3,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 so: a owl:Ontology ;
-  rdfs:label "SemanticOps Core Ontology" .
+  rdfs:label "SemanticOps Core Ontology" ;
+  owl:versionInfo "0.1.0" .
 
 so:BusinessEntity a owl:Class ;
   rdfs:label "Business Entity" .
@@ -14,4 +15,3 @@ so:KnowledgeAsset a owl:Class ;
 so:describes a owl:ObjectProperty ;
   rdfs:domain so:KnowledgeAsset ;
   rdfs:range so:BusinessEntity .
-

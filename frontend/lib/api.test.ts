@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { listIngestionDatasets, startIngestionRun, translateNaturalLanguageQuery } from "./api";
+import {
+  listIngestionDatasets,
+  listOntologyVersions,
+  startIngestionRun,
+  translateNaturalLanguageQuery,
+} from "./api";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -12,11 +17,13 @@ describe("agent workflow API", () => {
     await listIngestionDatasets();
     await startIngestionRun("sample");
     await translateNaturalLanguageQuery("Show all graphs");
+    await listOntologyVersions();
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       "http://localhost:8000/api/v1/workflows/ingestion/datasets",
       "http://localhost:8000/api/v1/workflows/ingestion/runs",
       "http://localhost:8000/api/v1/knowledge-graphs/translate-query",
+      "http://localhost:8000/api/v1/knowledge-graphs/ontology/versions",
     ]);
   });
 });

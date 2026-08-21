@@ -8,6 +8,7 @@ from app.api.v1.routes.knowledge_graphs import get_graph_store_service
 from app.core.settings import get_settings
 from app.domain.models import IngestionDatasetSummary, IngestionRunRequest, IngestionRunResult
 from app.infrastructure.database import get_session
+from app.infrastructure.persistence.ontology_version_repository import OntologyVersionRepository
 from app.infrastructure.persistence.validation_report_repository import ValidationReportRepository
 from app.infrastructure.persistence.workflow_run_repository import WorkflowRunRepository
 from app.services.graph_store_service import GraphStoreService
@@ -25,6 +26,7 @@ def get_ingestion_workflow_service(
     return IngestionWorkflowService(
         assets_dir=Path(get_settings().knowledge_assets_dir),
         run_repository=WorkflowRunRepository(session),
+        ontology_version_repository=OntologyVersionRepository(session),
         validation_repository=ValidationReportRepository(session),
         graph_store_service=graph_store_service,
     )

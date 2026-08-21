@@ -54,6 +54,19 @@ class OntologyModuleSummary(BaseModel):
     turtle: str
 
 
+class OntologyVersionSummary(BaseModel):
+    id: UUID
+    ontology_key: str
+    title: str
+    path: str
+    namespace: str
+    version: str | None = None
+    checksum: str
+    graph_iri: str
+    triple_count: int
+    created_at: datetime
+
+
 class SparqlQueryRequest(BaseModel):
     query: str = Field(..., min_length=1)
 
@@ -95,6 +108,7 @@ class IngestionRunResult(BaseModel):
     status: str
     steps: list[IngestionStep]
     validation_report_id: UUID | None = None
+    ontology_versions: list[OntologyVersionSummary] = Field(default_factory=list)
     triple_count: int | None = None
     error: str | None = None
     created_at: datetime

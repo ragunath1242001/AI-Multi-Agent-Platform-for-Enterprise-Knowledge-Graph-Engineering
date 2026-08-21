@@ -54,6 +54,7 @@ export type IngestionRun = {
   status: string;
   steps: { name: string; status: string; detail: string }[];
   validation_report_id?: string | null;
+  ontology_versions: OntologyVersion[];
   triple_count: number | null;
   error: string | null;
   created_at: string;
@@ -71,6 +72,19 @@ export type OntologyModule = {
   object_property_count: number;
   datatype_property_count: number;
   turtle: string;
+};
+
+export type OntologyVersion = {
+  id: string;
+  ontology_key: string;
+  title: string;
+  path: string;
+  namespace: string;
+  version: string | null;
+  checksum: string;
+  graph_iri: string;
+  triple_count: number;
+  created_at: string;
 };
 
 export async function getHealth(): Promise<{ status: string; service: string }> {
@@ -216,6 +230,18 @@ export async function listOntologyModules(): Promise<OntologyModule[]> {
 
   if (!response.ok) {
     throw new Error("Could not load ontology modules.");
+  }
+
+  return response.json();
+}
+
+export async function listOntologyVersions(): Promise<OntologyVersion[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/knowledge-graphs/ontology/versions`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not load ontology version history.");
   }
 
   return response.json();

@@ -19,11 +19,13 @@ from app.domain.models import (
     NaturalLanguageQueryRequest,
     NaturalLanguageQueryResult,
     OntologyModuleSummary,
+    OntologyVersionSummary,
     SparqlQueryRequest,
     SparqlQueryResult,
 )
 from app.infrastructure.database import get_session
 from app.infrastructure.graph.fuseki_client import FusekiClient
+from app.infrastructure.persistence.ontology_version_repository import OntologyVersionRepository
 from app.infrastructure.persistence.validation_report_repository import ValidationReportRepository
 from app.services.graph_store_service import GraphStoreService
 from app.services.query_translation_service import QueryTranslationService
@@ -82,6 +84,11 @@ async def list_ontology_modules() -> list[OntologyModuleSummary]:
         )
 
     return modules
+
+
+@router.get("/ontology/versions", response_model=list[OntologyVersionSummary])
+async def list_ontology_versions(session: SessionDependency) -> list[OntologyVersionSummary]:
+    return OntologyVersionRepository(session).list_recent()
 
 
 @router.post("/validate", response_model=GraphValidationResult)

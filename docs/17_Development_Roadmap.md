@@ -9,10 +9,10 @@ Phase 1:
 
 Phase 2:
 
-- Add ingestion workflows. In progress: built-in dataset ingestion runs are available.
-- Implement LangGraph agents.
+- Add ingestion workflows. Complete for built-in datasets.
+- Implement LangGraph agents. Complete for ontology review, RDF preparation, validation, promotion, and observability.
 - Store workflow runs in PostgreSQL. Complete for built-in ingestion workflows.
-- Add ontology versioning.
+- Add ontology versioning. Complete with immutable checksums, named graphs, API history, and run provenance.
 
 Phase 3:
 

@@ -22,10 +22,16 @@ def get_session_factory() -> sessionmaker[Session]:
 
 
 def initialize_database() -> None:
+    from app.infrastructure.persistence.ontology_version_record import OntologyVersionRecord
     from app.infrastructure.persistence.validation_report_record import ValidationReportRecord
+    from app.infrastructure.persistence.workflow_run_ontology_version_record import (
+        WorkflowRunOntologyVersionRecord,
+    )
     from app.infrastructure.persistence.workflow_run_record import WorkflowRunRecord
 
+    _ = OntologyVersionRecord
     _ = ValidationReportRecord
+    _ = WorkflowRunOntologyVersionRecord
     _ = WorkflowRunRecord
     Base.metadata.create_all(bind=get_engine())
 

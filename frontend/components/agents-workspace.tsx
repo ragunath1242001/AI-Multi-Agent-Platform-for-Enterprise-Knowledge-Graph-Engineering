@@ -92,15 +92,24 @@ export function AgentsWorkspace() {
         <div className="run-details">
           <h3>{activeRun ? activeRun.graph_name : "Latest run"}</h3>
           {activeRun ? (
-            <ol>
-              {activeRun.steps.map((step) => (
-                <li key={step.name}>
-                  <strong>{step.name}</strong>
-                  <span>{step.status}</span>
-                  <p>{step.detail}</p>
-                </li>
-              ))}
-            </ol>
+            <>
+              <ol>
+                {activeRun.steps.map((step) => (
+                  <li key={step.name}>
+                    <strong>{step.name}</strong>
+                    <span>{step.status}</span>
+                    <p>{step.detail}</p>
+                  </li>
+                ))}
+              </ol>
+              {activeRun.ontology_versions.length ? (
+                <p className="ontology-path">
+                  Ontologies: {activeRun.ontology_versions.map((version) => (
+                    `${version.ontology_key}@${version.version ?? version.checksum.slice(0, 12)}`
+                  )).join(", ")}
+                </p>
+              ) : null}
+            </>
           ) : (
             <p className="empty-text">Choose a dataset and run the agent workflow.</p>
           )}

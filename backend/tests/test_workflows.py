@@ -39,10 +39,14 @@ ex:cohort a so:BusinessEntity .
         (assets_dir / "examples" / "synthetic-medical-cohort.ttl").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
-    (assets_dir / "ontologies" / "semanticops-medical.ttl").write_text(
-        (assets_dir / "examples" / "synthetic-medical-cohort.ttl").read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
+    ontology_ttl = """@prefix ex: <https://example.com/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+ex: a owl:Ontology ; rdfs:label "Example Ontology" ; owl:versionInfo "1.0.0" .
+ex:Asset a owl:Class .
+"""
+    for filename in ("semanticops-core.ttl", "semanticops-medical.ttl"):
+        (assets_dir / "ontologies" / filename).write_text(ontology_ttl, encoding="utf-8")
     (assets_dir / "shapes" / "semanticops-core.shacl.ttl").write_text(
         """@prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix so: <https://semanticops.ai/ontology/core#> .
@@ -83,7 +87,14 @@ so:KnowledgeAssetShape a sh:NodeShape ;
             "promotion",
             "observability",
         ]
-        assert graph_store.promoted == ["synthetic-medical-cohort"]
+        assert graph_store.promoted[-1] == "synthetic-medical-cohort"
+        assert len(graph_store.promoted) == 3
+        assert len(run["ontology_versions"]) == 2
+        assert all(len(version["checksum"]) == 64 for version in run["ontology_versions"])
+
+        versions_response = client.get("/api/v1/knowledge-graphs/ontology/versions")
+        assert versions_response.status_code == 200
+        assert len(versions_response.json()) == 2
 
         (assets_dir / "examples" / "synthetic-medical-cohort.ttl").write_text(
             """@prefix so: <https://semanticops.ai/ontology/core#> .
@@ -105,7 +116,10 @@ ex:asset a so:KnowledgeAsset .
             "validation",
             "observability",
         ]
-        assert graph_store.promoted == ["synthetic-medical-cohort"]
+        assert len(graph_store.promoted) == 3
+        assert [version["id"] for version in failed["ontology_versions"]] == [
+            version["id"] for version in run["ontology_versions"]
+        ]
 
         runs_response = client.get("/api/v1/workflows/ingestion/runs")
         assert runs_response.status_code == 200

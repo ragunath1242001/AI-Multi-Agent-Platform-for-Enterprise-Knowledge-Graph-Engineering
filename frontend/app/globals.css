@@ -509,6 +509,10 @@ select {
   white-space: pre-wrap;
 }
 
+.ontology-versions {
+  margin-bottom: 16px;
+}
+
 .activity-list {
   display: grid;
   gap: 8px;

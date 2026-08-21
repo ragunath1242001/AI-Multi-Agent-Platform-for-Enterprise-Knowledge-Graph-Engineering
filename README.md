@@ -9,6 +9,7 @@ Enterprise knowledge graph delivery often requires separate tools and manual han
 - manage ontology and SHACL assets as version-controlled code;
 - validate RDF before it reaches the graph store;
 - promote approved data into queryable named graphs;
+- register immutable ontology versions and link them to workflow runs;
 - retain validation reports and ingestion history;
 - inspect graph inventory and workflow health from a web interface; and
 - translate natural-language questions into reviewable, read-only SPARQL when OpenAI access is configured.
@@ -33,7 +34,7 @@ flowchart LR
         Workflow --> Graph
     end
 
-    Validation --> PostgreSQL[(PostgreSQL<br/>reports and workflow runs)]
+    Validation --> PostgreSQL[(PostgreSQL<br/>reports, runs, and ontology provenance)]
     Workflow --> PostgreSQL
     Graph --> Fuseki[(Apache Jena Fuseki<br/>RDF named graphs and SPARQL)]
     Translation --> OpenAI[OpenAI Responses API<br/>optional]
@@ -43,7 +44,7 @@ flowchart LR
 ### Knowledge graph delivery flow
 
 1. Select a registered RDF dataset or submit Turtle through the API or user interface.
-2. Load the corresponding ontology and SHACL shapes from `kg/`.
+2. Register each ontology by version and SHA-256 checksum, then promote new snapshots to immutable named graphs.
 3. Parse the RDF and evaluate SHACL constraints with RDFS inference.
 4. Persist the validation result and workflow state in PostgreSQL.
 5. Promote conforming RDF to an isolated named graph in Fuseki.
@@ -57,9 +58,9 @@ Natural-language querying is an optional path. The generated SPARQL is returned 
 | --- | --- |
 | User experience | Next.js workspaces for operations, ingestion, ontology inspection, validation, observability, and the end-to-end demo |
 | API and orchestration | FastAPI runs a typed LangGraph workflow that reuses the existing validation and graph-store services |
-| Semantic governance | OWL/RDFS ontologies and SHACL shapes are stored as Turtle under `kg/` and validated with RDFLib and pySHACL |
+| Semantic governance | OWL/RDFS ontologies are registered by version and checksum, linked to each run, and validated with SHACL assets from `kg/` |
 | Graph persistence | Fuseki stores named RDF graphs and provides the SPARQL endpoint |
-| Operational persistence | PostgreSQL records validation reports and ingestion workflow runs |
+| Operational persistence | PostgreSQL records validation reports, ingestion runs, ontology versions, and their provenance links |
 | Agent orchestration | LangGraph executes ontology review, RDF preparation, validation, promotion, and observability with conditional failure routing |
 | AI-assisted querying | The OpenAI Responses API generates structured SPARQL translations that are checked for read-only operations |
 | Deployment | Docker Compose builds and connects the frontend, backend, PostgreSQL, and Fuseki services |
